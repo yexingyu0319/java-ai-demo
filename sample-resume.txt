@@ -1,0 +1,28 @@
+张伟
+电话：138-0013-8000  |  邮箱：zhangwei@example.com  |  现居：杭州
+求职意向：Java 后端开发工程师（实习）
+
+教育背景
+2023.09 - 2027.06   杭州电子科技大学   计算机科学与技术   本科
+主修课程：数据结构、操作系统、计算机网络、数据库原理、Java 程序设计
+GPA：3.6/4.0（专业前 15%）
+
+实习经历
+2025.07 - 2025.09   某电商科技公司   Java 开发实习生
+- 参与订单中心重构，使用 Spring Boot + MyBatis 重写 3 个核心接口，接口平均响应从 420ms 降到 180ms
+- 用 Redis 做热点商品缓存，缓存命中率 92%，数据库 QPS 下降约 40%
+- 编写 60+ 单元测试，覆盖率达 75%
+
+项目经历
+2025.03 - 2025.06   AI 简历解析服务（个人项目）
+- 技术栈：Java 17、Spring Boot 3、OkHttp、Fastjson、MySQL、Docker
+- 通过调用大模型 API 实现简历结构化解析，输出 JSON 后入库，单份简历处理耗时约 3 秒
+- 使用 Docker 打包交付，一条 docker-compose 命令即可在客户服务器启动
+
+技能清单
+- 编程语言：Java（熟练）、C/C++（熟悉）、JavaScript（了解）
+- 框架与中间件：Spring Boot、MyBatis、Redis、MySQL、Maven、Git
+- 工具：Linux 常用命令、Docker、Postman、IDEA
+
+自我评价
+自学能力强，习惯用文档沉淀问题；对 AI 应用落地方向有浓厚兴趣，希望从事 FDE / AI 应用开发方向。
