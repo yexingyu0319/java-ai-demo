@@ -88,16 +88,41 @@ List<String> issues = ResumeValidator.validate(resume);   // 空表示通过
 2. **抗损坏**：某一行写坏了，其他行照常能读（代码里会打印"跳过损坏记录"）；
 3. **好排查**：记事本直接打开，一行一条，肉眼可读。
 
-### ⑤ fastjson 不认 `record`，所以加了 Jackson
+### ⑤ fastjson 写不出 `record`，所以存文件改用 Jackson
 
-`record` 的读取方法是 `name()`，不是 `getName()`。
+`record` 的读取方法是 `name()`，不是 `getName()`。而 fastjson 1.x 序列化时找的正是 `getName()`。
 
-- **fastjson 1.2.83** 找的是 `getName()` → 序列化出来是空对象 `{}`；
-- **Jackson 2.17** 原生支持 record → 一个注解都不用加。
+**实测结果**（见 `FastjsonRecordTest.java`，可随时重跑）：
 
-所以项目里现在是"两个 JSON 库并存"：**解析模型返回用 fastjson（宽松），存储自己的数据用 Jackson（严格、支持 record）**。
+```
+=== 1. fastjson 把 record 转成 JSON ===
+结果：{}
+长度：2 字符                      ← 序列化失败，输出空对象
 
-> 这不是妥协，是真实工程的常态。也提醒你：**选库要看它对 record / 新语法支持到什么程度**。
+=== 2. fastjson 把 JSON 转回 record ===
+结果：Resume[name=李娜, phone=13900139000, ... ]
+姓名字段：李娜                      ← 反序列化却成功了
+```
+
+所以准确的说法是：**读得懂，写不出**。
+
+> ⚠️ 这个坑最阴险的地方是**它不报错**——默默给你 `{}`。
+> 如果没做这个实验，`resumes.jsonl` 里会存进一行行 `{}`，等到查询时才发现全是空数据。
+
+### 三条路，为什么选了 C
+
+| 方案 | 做法 | 优点 | 缺点 |
+|---|---|---|---|
+| A | 保持 record，手动用 `JSONObject` 拼 11 个字段 | 只用一个 JSON 库 | 以后加字段必须同步改，极易漏 |
+| B | 把 record 换成普通 class，手写 get/set | 纯 fastjson，符合传统教程 | 11 个字段的样板代码，`record` 白用了 |
+| **C（采用）** | **解析用 fastjson，存储用 Jackson** | 代码最少；**Jackson 是 Spring Boot 默认库，第三周必然要用** | 多一个 1.5 MB 依赖 |
+
+项目里现在"两个 JSON 库并存"：
+
+- **解析模型返回** → fastjson（宽松，能容忍脏格式）
+- **存储自己的数据** → Jackson（严格，原生支持 record）
+
+> 这不是妥协，是真实工程的常态。也提醒一句：**选库要看它对 record / 新语法支持到什么程度**，而且要**用实验验证**，别只看文档说"支持"。
 
 ---
 
