@@ -155,6 +155,32 @@ public class LeetCodeSolutions {
     }
 
     // =====================================================================
+    // 第 704 题：二分查找（Day 5）
+    // 题目：在一个【已经排序】的数组里找目标值，返回下标；找不到返回 -1。
+    // 例子：nums = [-1,0,3,5,9,12], target = 9 → 4
+    // 思路：每次取中间那个数比较，比目标小就往右找，比目标大就往左找，每次砍掉一半。
+    // =====================================================================
+    public static int search(int[] nums, int target) {
+        int left = 0;                    // 左边界（下标）
+        int right = nums.length - 1;     // 右边界（最后一个下标）
+
+        // 注意这里是 <= 而不是 <：只剩一个元素时也必须进循环检查
+        while (left <= right) {
+            // 这么写而不是 (left + right) / 2，是为了防止两个大数相加溢出变成负数
+            int mid = left + (right - left) / 2;
+
+            if (nums[mid] == target) {
+                return mid;              // 找到了
+            } else if (nums[mid] < target) {
+                left = mid + 1;          // 目标在右半边
+            } else {
+                right = mid - 1;         // 目标在左半边
+            }
+        }
+        return -1;                       // 找完了，没有
+    }
+
+    // =====================================================================
     // 下面是"自动判题器"：把上面四个方法用 LeetCode 官方给出的样例跑一遍，
     // 打印每一条是否通过。你不需要看懂它，但它能证明代码是对的。
     // =====================================================================
@@ -187,6 +213,15 @@ public class LeetCodeSolutions {
         total += 2;
         pass += checkArr("[1,2,2,1] ∩ [2,2]", intersection(new int[]{1, 2, 2, 1}, new int[]{2, 2}), new int[]{2});
         pass += checkArr("[4,9,5] ∩ [9,4,9,8,4]", intersection(new int[]{4, 9, 5}, new int[]{9, 4, 9, 8, 4}), new int[]{4, 9});
+
+        System.out.println("\n========== 第 704 题：二分查找 ==========");
+        total += 5;
+        int[] arr = {-1, 0, 3, 5, 9, 12};
+        pass += check("nums=[-1,0,3,5,9,12], target=9", String.valueOf(search(arr, 9)), "4");
+        pass += check("目标 2（不存在）", String.valueOf(search(arr, 2)), "-1");
+        pass += check("目标 -1（第一个）", String.valueOf(search(arr, -1)), "0");
+        pass += check("目标 12（最后一个）", String.valueOf(search(arr, 12)), "5");
+        pass += check("单元素数组 [5], target=5", String.valueOf(search(new int[]{5}, 5)), "0");
 
         System.out.println("\n========================================");
         System.out.println("通过 " + pass + " / " + total);

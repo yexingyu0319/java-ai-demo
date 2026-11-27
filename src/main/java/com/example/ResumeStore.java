@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 极简"简历仓库"：用一个文本文件存所有简历，一行一份。
@@ -31,12 +32,34 @@ public class ResumeStore {
         this.file = file;
     }
 
-    /** 追加一份简历 */
-    public void save(Resume resume) throws IOException {
+    /**
+     * 追加一份简历。
+     *
+     * 注意这里的"去重"：真实项目里靠数据库主键/唯一索引保证，
+     * 我们用「姓名 + 手机号 + 学校」当业务主键，已存在就跳过。
+     * 否则同一个人的简历会被反复写入，查询时出现一堆重复行。
+     */
+    public boolean save(Resume resume) throws IOException {
+        if (exists(resume)) {
+            return false;
+        }
         Files.createDirectories(file.getParent());
         String line = mapper.writeValueAsString(resume);
         Files.writeString(file, line + System.lineSeparator(), StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        return true;
+    }
+
+    /** 判断同一份简历是否已存在（按业务主键比较） */
+    public boolean exists(Resume resume) throws IOException {
+        for (Resume r : findAll()) {
+            if (Objects.equals(r.name(), resume.name())
+                    && Objects.equals(r.phone(), resume.phone())
+                    && Objects.equals(r.school(), resume.school())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** 读出全部简历（跳过空行和坏行） */
